@@ -193,66 +193,71 @@ import sqlite3
 
 #######################################################  Database Connection#####################################################
 #######################################################  Database Connection#####################################################
+try:
+    con = sqlite3.connect('dulux.db')
+    cur = con.cursor()
 
-con = sqlite3.connect('dulux.db')
-cur = con.cursor()
-curupdate = con.cursor()
+    #Creating Mainlist with For Loop
+    cur.execute("SELECT * FROM maintable")
+    metadatamain = cur.fetchall()
+    mainlist = []
+    for item in metadatamain:
+        mainlist.append(item[1])
 
-#Creating Mainlist with For Loop
-cur.execute("SELECT * FROM maintable")
-metadatamain = cur.fetchall()
-mainlist = []
-for item in metadatamain:
-    mainlist.append(item[1])
+    #Creating Sub List for Velvet
+    cur.execute("SELECT * FROM velvettable")
+    velvetdata = cur.fetchall()
+    velvetlist = []
+    for item in velvetdata:
+        velvetlist.append(item[1])
 
-#Creating Sub List for Velvet
-cur.execute("SELECT * FROM velvettable")
-velvetdata = cur.fetchall()
-velvetlist = []
-for item in velvetdata:
-    velvetlist.append(item[1])
+    #Creating Sub Table list for Velvet Table
+    cur.execute("SELECT * FROM vsubtable")
+    vsubtabledata = cur.fetchall()
+    vsubtablelist = []
+    for item in vsubtabledata:
+        vsubtablelist.append(item[2])
 
-#Creating Sub Table list for Velvet Table
-cur.execute("SELECT * FROM vsubtable")
-vsubtabledata = cur.fetchall()
-vsubtablelist = []
-for item in vsubtabledata:
-    vsubtablelist.append(item[2])
+    #Creating Sub List for Weather
+    cur.execute("SELECT * FROM weathertable")
+    weatherdata = cur.fetchall()
+    weatherlist = []
+    for item in weatherdata:
+        weatherlist.append(item[1])
 
-#Creating Sub List for Weather
-cur.execute("SELECT * FROM weathertable")
-weatherdata = cur.fetchall()
-weatherlist = []
-for item in weatherdata:
-    weatherlist.append(item[1])
+    #Creating Sub Table list for Weather Table
+    cur.execute("SELECT * FROM wsubtable")
+    wsubtabledata = cur.fetchall()
+    wsubtablelist = []
+    for item in wsubtabledata:
+        wsubtablelist.append(item[2])
 
-#Creating Sub Table list for Weather Table
-cur.execute("SELECT * FROM wsubtable")
-wsubtabledata = cur.fetchall()
-wsubtablelist = []
-for item in wsubtabledata:
-    wsubtablelist.append(item[2])
+    #Creating Sub List for Dulux
+    cur.execute("SELECT * FROM duluxtable")
+    duluxdata = cur.fetchall()
+    duluxlist = []
+    for item in duluxdata:
+        duluxlist.append(item[1])
 
-#Creating Sub List for Dulux
-cur.execute("SELECT * FROM duluxtable")
-duluxdata = cur.fetchall()
-duluxlist = []
-for item in duluxdata:
-    duluxlist.append(item[1])
+    #Creating Sub Table list for Dulux Table
+    cur.execute("SELECT * FROM dsubtable")
+    dsubtabledata = cur.fetchall()
+    dsubtablelist = []
+    for item in dsubtabledata:
+        dsubtablelist.append(item[2])
 
-#Creating Sub Table list for Dulux Table
-cur.execute("SELECT * FROM dsubtable")
-dsubtabledata = cur.fetchall()
-dsubtablelist = []
-for item in dsubtabledata:
-    dsubtablelist.append(item[2])
-
-#Creating Sub List for Colorant
-cur.execute("SELECT * FROM coloranttable")
-colorantdata = cur.fetchall()
-colorantlist = []
-for item in colorantdata:
-    colorantlist.append(item[2])
+    #Creating Sub List for Colorant
+    cur.execute("SELECT * FROM coloranttable")
+    colorantdata = cur.fetchall()
+    colorantlist = []
+    for item in colorantdata:
+        colorantlist.append(item[2])
+        
+except Exception as e:
+    messagebox.showerror('Error',e)
+    
+finally:
+    con.commit()
 
 #######################################################  Tkinter Programming Starts ##############################################################
 #######################################################  Tkinter Programming Starts ##############################################################
@@ -299,39 +304,47 @@ class Frame_creation:
 
 ##Defining Function that will response after submitting Data
 def entry_func(click_event,data_set,dict_name,frame_id,frame_id2,table_name,identifier):
-#Refreshing the Frame
-    for i in frame_id2.winfo_children():
-        i.destroy()
-    
-    for a, b in dict_name.items():
-        dict_name.update({a:b.get()})
-        
-# Specifying Action Only for Sell Entry and Addition Entry            
-    if identifier == 'Sell' or identifier == 'Add':
-    #Looping through Dictionary to get Values_______________________________________
-        for key, value in dict_name.items():
-    #Looping through List to get the stored value___________________________________
-            for locator in data_set:
-    #Matching the Entry keys with the List Keys_____________________________________
-                if key==locator[2]:
-    # Specifying Action for Sell Entry______________________________________________
-                    if identifier == 'Sell':
-    #Deducting and saving the new value in the dictionary___________________________
-                        dict_name.update({key:(locator[3]-value)})
-    # Specifying Action for Stock Adding Entry______________________________________
-                    else:
-    #Deducting and saving the new value in the dictionary___________________________
-                        dict_name.update({key:(locator[3]+value)})
+    try:
+        con = sqlite3.connect('dulux.db')
+        curupdate = con.cursor()
+    #Refreshing the Frame
+        for i in frame_id2.winfo_children():
+            i.destroy()
 
-#Looping with new value to update the database______________________________________
-    for key1, value1 in dict_name.items(): 
-        id=key1
-        amount=value1
-        curupdate.execute(f'UPDATE {table_name} SET quantity=? WHERE subcatagory=?', (amount,id))
+        for a, b in dict_name.items():
+            dict_name.update({a:int(b.get())})
+
+    # Specifying Action Only for Sell Entry and Addition Entry            
+        if identifier == 'Sell' or identifier == 'Add':
+        #Looping through Dictionary to get Values_______________________________________
+            for key, value in dict_name.items():
+        #Looping through List to get the stored value___________________________________
+                for locator in data_set:
+        #Matching the Entry keys with the List Keys_____________________________________
+                    if key==locator[2]:
+        # Specifying Action for Sell Entry______________________________________________
+                        if identifier == 'Sell':
+        #Deducting and saving the new value in the dictionary___________________________
+                            dict_name.update({key:(locator[3]-value)})
+        # Specifying Action for Stock Adding Entry______________________________________
+                        else:
+        #Deducting and saving the new value in the dictionary___________________________
+                            dict_name.update({key:(locator[3]+value)})
+
+    #Looping with new value to update the database______________________________________
+        for key1, value1 in dict_name.items(): 
+            id=key1
+            amount=value1
+            curupdate.execute(f'UPDATE {table_name} SET quantity=? WHERE subcatagory=?', (amount,id))
+        
+    except Exception as e:
+        messagebox.showerror('Error',e)
+        
+    finally:
 #Recalling the Main Function to Refresh the Full Frame with new Values__________
-    detail_view(click_event,frame_id,frame_id2,table_name,identifier)
+        detail_view(click_event,frame_id,frame_id2,table_name,identifier)
 #Commiting the update___________________________________________________________
-    con.commit()
+        con.commit()
 
 
 
@@ -339,34 +352,43 @@ def entry_func(click_event,data_set,dict_name,frame_id,frame_id2,table_name,iden
 def detail_view(click_event,frame_id,frame_id2,table_name,identifier):
 # Declaring Random Dictionary to store Data
     dict1 = {}
+    
+    try:
+        con = sqlite3.connect('dulux.db')
+        cur = con.cursor()
 #Getting Values from the Database
-    cur.execute(f'SELECT * FROM {table_name}')
-    virtual = cur.fetchall()
-    usednumber = 1
+        cur.execute(f'SELECT * FROM {table_name}')
+        virtual = cur.fetchall()
+        usednumber = 1
 #----------------Looping through Data and generating Lables And Entry Widgets------------
-    for i in virtual:
-        if click_event in i:
-            if identifier == 'Sell' or identifier == 'Add' or identifier == 'Reset':
-                label = Label(frame_id,bg='#5356BF',fg='white', text=i[2]).grid(row=usednumber, column=2, padx=25, pady=30)
-                dict1.update({i[2]:IntVar()})
-                entryurl = 'entry' + str(usednumber)
-                entryurl = Entry(frame_id, textvariable=dict1[i[2]]).grid(row=usednumber,column=3, padx=50, pady=30)
-                label1 = Label(frame_id,bg='#E55E1E',fg='black', text=f'Stock at Present: {i[3]}').grid(row=usednumber, column=4,padx=60,pady=30)
-                usednumber += 1
-            else:
-                label = Label(frame_id,bg='#5356BF',fg='white', text=i[2]).grid(row=usednumber, column=2, padx=25, pady=30)
-                label1 = Label(frame_id,bg='#E55E1E',fg='black', text=f'Stock at Present: {i[3]}').grid(row=usednumber, column=4,padx=60,pady=30)
-                usednumber += 1
+        for i in virtual:
+            if click_event in i:
+                if identifier == 'Sell' or identifier == 'Add' or identifier == 'Reset':
+                    label = Label(frame_id,bg='#5356BF',fg='white', text=i[2]).grid(row=usednumber, column=2, padx=25, pady=30)
+                    dict1.update({i[2]:StringVar()})
+                    entryurl = 'entry' + str(usednumber)
+                    entryurl = Entry(frame_id, textvariable=dict1[i[2]]).grid(row=usednumber,column=3, padx=50, pady=30)
+                    label1 = Label(frame_id,bg='#E55E1E',fg='black', text=f'Stock at Present: {i[3]}').grid(row=usednumber, column=4,padx=60,pady=30)
+                    usednumber += 1
+                else:
+                    label = Label(frame_id,bg='#5356BF',fg='white', text=i[2]).grid(row=usednumber, column=2, padx=25, pady=30)
+                    label1 = Label(frame_id,bg='#E55E1E',fg='black', text=f'Stock at Present: {i[3]}').grid(row=usednumber, column=4,padx=60,pady=30)
+                    usednumber += 1
 #Button Call Function   
-    def save():
+        def save():
 #Calling the Function to save Value in DataBase
-        entry_func(click_event,virtual,dict1,frame_id,frame_id2,table_name,identifier)
+            entry_func(click_event,virtual,dict1,frame_id,frame_id2,table_name,identifier)
 # Submit Button to Save Value  
-    if identifier == 'Sell' or identifier == 'Add' or identifier == 'Reset':         
-        button1 = Button(frame_id2, bg='#86D07D', text='Submit')
-        button1.grid()
-        button1['command'] = save            
+        if identifier == 'Sell' or identifier == 'Add' or identifier == 'Reset':         
+            button1 = Button(frame_id2, bg='#86D07D', text='Submit')
+            button1.grid()
+            button1['command'] = save            
 
+    except Exception as e:
+        messagebox.showerror('Error',e)
+        
+    finally:
+        con.commit()
 
 
 #Defining Sell Page

@@ -3,6 +3,8 @@ Its a Python Based Desktop UI enabled software for maintainning stock record in 
 
 its created using tkinter UI Framework
 
+It uses SQLITE data base which comes inbuild with Python Version 3
+
 Install Python
 
 Install Tkinter
