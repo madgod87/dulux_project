@@ -306,13 +306,15 @@ class Frame_creation:
 def entry_func(click_event,data_set,dict_name,frame_id,frame_id2,table_name,identifier):
     con = sqlite3.connect('dulux.db')
     curupdate = con.cursor()
-    #Refreshing the Frame
+    # #Refreshing the Frame
+    for i in frame_id.winfo_children():
+        i.destroy()
     for i in frame_id2.winfo_children():
         i.destroy()
     for a, b in dict_name.items():
+        if b.get() == '':
+            dict_name.update({a:b.set('0')})
         dict_name.update({a:int(b.get())})
-        print(b)
-
 # Specifying Action Only for Sell Entry and Addition Entry            
     if identifier == 'Sell' or identifier == 'Add':
     #Looping through Dictionary to get Values_______________________________________
@@ -334,11 +336,12 @@ def entry_func(click_event,data_set,dict_name,frame_id,frame_id2,table_name,iden
         id=key1
         amount=value1
         curupdate.execute(f'UPDATE {table_name} SET quantity=? WHERE subcatagory=?', (amount,id))
+#Commiting the update___________________________________________________________
+    con.commit()
 #Recalling the Main Function to Refresh the Full Frame with new Values__________
     detail_view(click_event,frame_id,frame_id2,table_name,identifier)
 
-#Commiting the update___________________________________________________________
-    con.commit()
+
 
 
 
@@ -347,10 +350,10 @@ def detail_view(click_event,frame_id,frame_id2,table_name,identifier):
 # Declaring Random Dictionary to store Data
     dict1 = {}
     con = sqlite3.connect('dulux.db')
-    cur = con.cursor()
+    cur1 = con.cursor()
 #Getting Values from the Database
-    cur.execute(f'SELECT * FROM {table_name}')
-    virtual = cur.fetchall()
+    cur1.execute(f'SELECT * FROM {table_name}')
+    virtual = cur1.fetchall()
     usednumber = 1
 #----------------Looping through Data and generating Lables And Entry Widgets------------
     for i in virtual:
@@ -511,7 +514,7 @@ def status():
                 frame3.clear_frame()
                 frame4.clear_frame()
     # Calling The function That will Show the Details and it will call the Submit Button Function
-                detail_view(new_event, frame3.frame, frame4.frame, 'coloranttable', '')  
+                detail_view(new_event, frame3.frame, frame4.frame, 'coloranttable', '' )  
     # Second Option Menu 
             click2 = StringVar()
             menu2 = Option_Menu(click2, frame2.frame, colorantlist, menu_thirdc)
